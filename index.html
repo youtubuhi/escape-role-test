@@ -31,13 +31,14 @@
   <div class="brandbar"><span>방탈출 인간연구소</span><span class="testno">TEST 002</span></div>
   <div class="rule"></div>
   <section id="start">
-    <img id="startImage" class="start-image hidden" src="images/main-image.png" alt="내 방탈출 팀원 사용설명서" onload="this.classList.remove('hidden')" onerror="this.classList.add('hidden')">
+    <img id="startImage" class="start-image hidden" src="images/main-image.jpg" alt="내 방탈출 팀원 사용설명서" onload="this.classList.remove('hidden')" onerror="this.classList.add('hidden')">
     <div class="kicker">ESCAPE TEAM ROLE CHECK</div>
     <h1>내 방탈출 팀원<br>사용설명서</h1>
     <p class="start-desc">미술관 잠입 작전에서 가장 나다운 행동을 골라보세요. 같이 방탈출하면 내가 어떤 팀원인지 알려드립니다.</p>
     <div class="meta"><span>10문항</span><span>약 1~2분</span><span>결과 7종</span></div>
     <button class="btn primary" type="button" onclick="begin()">테스트 시작</button>
     <button class="btn" type="button" onclick="shareTest()">친구에게 테스트 공유하기</button>
+    <button class="btn" type="button" onclick="goToOtherTests('start')">다른 테스트 하러 가기</button>
   </section>
   <section id="quiz" class="hidden">
     <div class="quiz-head"><div id="qnum" class="qnum"></div><div class="check">TEAM ROLE CHECK</div></div>
@@ -62,6 +63,7 @@
       <button class="btn primary" type="button" onclick="shareResultCard()">내 결과 공유하기</button>
       <button class="btn" type="button" onclick="shareTest()">테스트 공유하기</button>
       <button class="btn" type="button" onclick="resetTest()">다시 하기</button>
+      <button class="btn" type="button" onclick="goToOtherTests('result')">다른 테스트 하러 가기</button>
     </div>
     <div class="types-wrap"><h3 class="types-title">전체 유형 보기</h3><p class="types-sub">친구 결과가 궁금하다면 다른 유형도 눌러보세요.</p><div id="typesGrid" class="types-grid"></div></div>
   </section>
@@ -74,6 +76,7 @@
 const TEST_ID="002";
 const DEBUG_MODE=new URLSearchParams(location.search).get("debug")==="1";
 const TYPES={search:"숨은 단서 탐지견형",pm:"탈출 총괄 PM형",veteran:"기출 꿰뚫는 경력직형",genius:"문제 분쇄 이과천재형",inventory:"인간 인벤토리형",social:"NPC 절친 인싸형",tank:"인간 방패 탱커형"};
+const TYPE_EMOJIS={tank:"🛡️",genius:"🧠",search:"🔍",social:"🐶",inventory:"🗝️",pm:"📋",veteran:"🧩"};
 const QUESTION_TITLES=["작전 시작 3초 만에","제목이 수상하면 일단 의심한다","갑작스러운 사회생활","레이저보다 팀원의 설명이 더 위험하다","누가 분명 여기 뒀는데","정답인데 자물쇠가 인정하지 않는다","열쇠는 분명 이 방에 있습니다","의문의 조력자가 나타났다","침착하라는 사람이 가장 안 침착하다","보물보다 서사가 중요해졌다"];
 const PROFILE_WEIGHTS=[
  [{search:2,action:1,manage:-1},{manage:2,immerse:1,action:-1},{solve:2,search:1,immerse:-1},{manage:1,search:1}],
@@ -137,19 +140,35 @@ function profileScores(){const raw=profileRaw(),values=Object.values(raw),mean=v
 function fillAnalysis(target,r){target.innerHTML="";r.analysis.forEach(t=>{const p=document.createElement("p");p.textContent=t;target.appendChild(p)});const c=document.createElement("p");c.className="closing";c.textContent=r.closing;target.appendChild(c)}
 function renderScores(profile,target=scoreList){target.innerHTML="";Object.entries(PROFILE_LABELS).forEach(([k,label])=>{const v=profile[k],row=document.createElement("div");row.className="score";row.innerHTML=`<div class="score-top"><span>${label}</span><strong>${v}</strong></div><div class="meter"><div class="fill" style="width:${v}%"></div></div>`;target.appendChild(row)})}
 function renderDebug(){if(!DEBUG_MODE){debugBox.classList.add("hidden");return}const{score,primary}=tally(),raw=profileRaw();debugBox.classList.remove("hidden");debugBox.innerHTML=`<h3>로직 테스트 모드</h3><div class="debug-grid"><pre>${TYPE_ORDER.map(t=>`${TYPES[t]}\n  결과 ${score[t]}점 · 주 선택 ${primary[t]}회`).join("\n")}</pre><pre>${Object.entries(PROFILE_LABELS).map(([k,label])=>`${label}\n  원점수 ${raw[k]} → 표시 ${lastProfile[k]}`).join("\n")}\n\n경력직 자격: ${primary.veteran>=2?"충족":"미충족"}</pre></div>`}
-function finish({fromLink=false}={}){showOnly("result");myType=classify();lastProfile=profileScores();const r=RESULTS[myType];if(!fromLink){trackEvent("test_complete",{result_type:myType,result_name:r.name});history.replaceState(null,"",localStateUrl(encodeChoices()))}resultImage.src=r.image;resultImage.alt=r.name;resultTitle.textContent=r.name;resultOne.textContent=r.one;example.textContent=r.example;renderScores(lastProfile);fillAnalysis(analysis,r);renderDebug();renderTypeGrid();scrollTo({top:0,behavior:fromLink?"auto":"smooth"})}
-function renderTypeGrid(){typesGrid.innerHTML="";TYPE_ORDER.forEach(type=>{const b=document.createElement("button");b.type="button";b.className="type-card";b.innerHTML=`<span class="type-card-name">${RESULTS[type].name}</span>`;b.onclick=()=>showType(type);typesGrid.appendChild(b)})}
-function showType(type){trackEvent("view_other_type",{type_key:type,type_name:RESULTS[type].name});const r=RESULTS[type];showOnly("typeDetail");typeImage.src=r.image;typeImage.alt=r.name;typeTitle.textContent=r.name;typeOne.textContent=r.one;typeExample.textContent=r.example;fillAnalysis(typeAnalysis,r);scrollTo({top:0,behavior:"smooth"})}
+function finish({fromLink=false}={}){showOnly("result");myType=classify();lastProfile=profileScores();const r=RESULTS[myType];if(!fromLink){trackEvent("test_complete",{result_type:myType,result_name:r.name});history.replaceState(null,"",localStateUrl(encodeChoices()))}resultImage.src=r.image;resultImage.alt=r.name;resultTitle.textContent=`${TYPE_EMOJIS[myType]} ${r.name}`;resultOne.textContent=r.one;example.textContent=r.example;renderScores(lastProfile);fillAnalysis(analysis,r);renderDebug();renderTypeGrid();scrollTo({top:0,behavior:fromLink?"auto":"smooth"})}
+function renderTypeGrid(){typesGrid.innerHTML="";TYPE_ORDER.forEach(type=>{const b=document.createElement("button");b.type="button";b.className="type-card";b.innerHTML=`<span class="type-card-name">${TYPE_EMOJIS[type]} ${RESULTS[type].name}</span>`;b.onclick=()=>showType(type);typesGrid.appendChild(b)})}
+function showType(type){trackEvent("view_other_type",{type_key:type,type_name:RESULTS[type].name});const r=RESULTS[type];showOnly("typeDetail");typeImage.src=r.image;typeImage.alt=r.name;typeTitle.textContent=`${TYPE_EMOJIS[type]} ${r.name}`;typeOne.textContent=r.one;typeExample.textContent=r.example;fillAnalysis(typeAnalysis,r);scrollTo({top:0,behavior:"smooth"})}
 function backToMyResult(){showOnly("result");scrollTo({top:0,behavior:"smooth"})}
 function encodeChoices(){return btoa(QUESTIONS.map(q=>choices[q.id]).join("")).replaceAll("=","")}
 function decodeChoices(value){try{const s=atob(value);if(!/^\d{10}$/.test(s))return false;const nums=[...s].map(Number);if(nums.some(n=>n<0||n>3))return false;choices=Object.fromEntries(nums.map((n,i)=>[i,n]));return true}catch{return false}}
 function cleanUrl(){return `${location.origin}${location.pathname}`}
 async function sharePayload(title,text,url){if(navigator.share){try{await navigator.share({title,text,url});return true}catch(e){if(e&&e.name==="AbortError")return false}}try{await navigator.clipboard.writeText([text,url].filter(Boolean).join("\n"));alert("공유 링크를 복사했어요.");return true}catch{return false}}
 async function shareTest(){trackEvent("test_share");await sharePayload("내 방탈출 팀원 사용설명서","같이 방탈출하면 나는 어떤 팀원일까?",cleanUrl())}
+function goToOtherTests(placement){trackEvent("other_tests_click",{placement});location.href="https://youtubuhi.github.io/escape-player-lab/"}
 function drawWrapped(ctx,text,x,y,maxWidth,lineHeight,maxLines=3){const chars=[...text];let line="",lines=[];for(const ch of chars){const test=line+ch;if(ctx.measureText(test).width>maxWidth&&line){lines.push(line);line=ch}else line=test}if(line)lines.push(line);lines.slice(0,maxLines).forEach((l,i)=>ctx.fillText(l,x,y+i*lineHeight));return y+Math.min(lines.length,maxLines)*lineHeight}
-function loadImage(src){return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=src})}
+function loadImage(src){return new Promise((resolve,reject)=>{const im=new Image();im.crossOrigin="anonymous";im.onload=()=>resolve(im);im.onerror=reject;im.src=src})}
 async function makeShareCanvas(){const r=RESULTS[myType],canvas=document.createElement("canvas");canvas.width=900;canvas.height=1500;const ctx=canvas.getContext("2d");ctx.fillStyle="#f5f1eb";ctx.fillRect(0,0,900,1500);const im=await loadImage(r.image),imgW=510,imgH=760,x=(900-imgW)/2,y=45,scale=Math.min(imgW/im.width,imgH/im.height),dw=im.width*scale,dh=im.height*scale;ctx.drawImage(im,x+(imgW-dw)/2,y+(imgH-dh)/2,dw,dh);let cy=850;ctx.fillStyle="#77716b";ctx.font="24px Arial";ctx.fillText("방탈출 인간연구소 · TEST 002",60,cy);cy+=58;ctx.fillStyle="#151515";ctx.font="800 45px Arial";ctx.fillText(r.name,60,cy);cy+=48;ctx.fillStyle="#555";ctx.font="26px Arial";cy=drawWrapped(ctx,r.one,60,cy,780,37,2)+22;ctx.font="700 23px Arial";Object.entries(PROFILE_LABELS).forEach(([k,label],i)=>{const v=lastProfile[k],yy=cy+i*82;ctx.fillStyle="#151515";ctx.fillText(label,60,yy);ctx.textAlign="right";ctx.fillText(String(v),840,yy);ctx.textAlign="left";ctx.fillStyle="#ddd5cc";ctx.fillRect(60,yy+17,780,9);ctx.fillStyle="#b7202c";ctx.fillRect(60,yy+17,780*v/100,9)});return canvas}
-async function shareResultCard(){trackEvent("result_share",{result_type:myType,result_name:RESULTS[myType].name});const canvas=await makeShareCanvas(),blob=await new Promise(r=>canvas.toBlob(r,"image/png")),file=new File([blob],"my-escape-team-role.png",{type:"image/png"}),url=`${cleanUrl()}?r=${encodeChoices()}`;if(navigator.canShare&&navigator.canShare({files:[file]})&&navigator.share){try{await navigator.share({files:[file],url});return}catch(e){if(e&&e.name==="AbortError")return}}const a=document.createElement("a");a.href=canvas.toDataURL("image/png");a.download="my-escape-team-role.png";a.click();try{await navigator.clipboard.writeText(url);alert("결과 이미지를 저장했고 결과 링크를 복사했어요.")}catch{alert("결과 이미지를 저장했어요.")}}
+async function shareResultCard(){
+  const r=RESULTS[myType],url=`${cleanUrl()}?r=${encodeChoices()}`;
+  trackEvent("result_share",{result_type:myType,result_name:r.name});
+  try{
+    const canvas=await makeShareCanvas(),blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/png"));
+    if(!blob)throw new Error("share image creation failed");
+    const file=new File([blob],"my-escape-team-role.png",{type:"image/png"});
+    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+      try{await navigator.share({title:`${TYPE_EMOJIS[myType]} ${r.name}`,text:`${TYPE_EMOJIS[myType]} ${r.name}`,url,files:[file]});return}catch(e){if(e&&e.name==="AbortError")return}
+    }
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="my-escape-team-role.png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+    try{await navigator.clipboard.writeText(url);alert("결과 이미지를 저장했고 결과 링크를 복사했어요.")}catch{alert("결과 이미지를 저장했어요.")}
+  }catch{
+    await sharePayload(`${TYPE_EMOJIS[myType]} ${r.name}`,`${TYPE_EMOJIS[myType]} ${r.name}`,url);
+  }
+}
 function resetTest(){history.replaceState(null,"",localStateUrl());choices={};myType=null;lastProfile=null;showOnly("start");scrollTo({top:0,behavior:"smooth"})}
 window.addEventListener("load",()=>{gtag("event","page_view",{test_id:TEST_ID,page_location:location.href,page_title:document.title});if(startImage.complete&&startImage.naturalWidth)startImage.classList.remove("hidden");const encoded=new URLSearchParams(location.search).get("r");if(encoded&&decodeChoices(encoded))finish({fromLink:true});else showOnly("start")});
 </script>
