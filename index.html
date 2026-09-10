@@ -161,7 +161,7 @@ async function shareResultCard(){
     if(!blob)throw new Error("share image creation failed");
     const file=new File([blob],"my-escape-team-role.png",{type:"image/png"});
     if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-      try{await navigator.share({title:`${TYPE_EMOJIS[myType]} ${r.name}`,text:`${TYPE_EMOJIS[myType]} ${r.name}`,url,files:[file]});return}catch(e){if(e&&e.name==="AbortError")return}
+      try{await navigator.share({files:[file]});return}catch(e){if(e&&e.name==="AbortError")return}
     }
     const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="my-escape-team-role.png";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
     try{await navigator.clipboard.writeText(url);alert("결과 이미지를 저장했고 결과 링크를 복사했어요.")}catch{alert("결과 이미지를 저장했어요.")}
