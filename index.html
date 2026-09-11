@@ -90,7 +90,7 @@
   <section id="start">
     <img id="startImage" class="start-image hidden" src="images/main-image.png" alt="내 방탈출 팀원 사용설명서" onload="this.classList.remove('hidden')" onerror="this.classList.add('hidden')">
     <div class="kicker">ESCAPE TEAM ROLE CHECK</div>
-    <h1>내 방탈출 팀원<br>사용설명서</h1>
+    <h1>내 방탈출 팀원 사용설명서</h1>
     <p class="start-desc">미술관 잠입 작전에서 가장 나다운 행동을 골라보세요. 같이 방탈출하면 내가 어떤 팀원인지 알려드립니다.</p>
     <div class="meta"><span>10문항</span><span>약 1~2분</span><span>결과 7종</span></div>
     <button class="btn primary" type="button" onclick="begin()">테스트 시작</button>
@@ -175,6 +175,34 @@
       <button class="btn" type="button" onclick="shareTest()">테스트 공유하기</button>
       <button class="btn" type="button" onclick="resetTest()">다시 하기</button>
       <button class="btn" type="button" onclick="goToOtherTests('result')">다른 테스트 하러 가기</button>
+     <a
+  href="https://www.instagram.com/escapeplayerlab/"
+  target="_blank"
+  rel="noopener noreferrer"
+  class="instagram-follow"
+  onclick="gtag('event', 'instagram_follow_click', {
+    page: 'result'
+  });"
+>
+  <svg
+    viewBox="0 0 24 24"
+    width="30"
+    height="30"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.8"
+    aria-hidden="true"
+  >
+    <rect x="3" y="3" width="18" height="18" rx="5"></rect>
+    <circle cx="12" cy="12" r="4"></circle>
+    <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"></circle>
+  </svg>
+
+  <span>
+    <strong>방탈출 인간연구소 팔로우하기</strong>
+    <small>매주 새로운 테스트 소식 받기</small>
+  </span>
+</a>
     </div>
     <div class="types-wrap"><h3 class="types-title">전체 유형 보기</h3><p class="types-sub">친구 결과가 궁금하다면 다른 유형도 눌러보세요.</p><div id="typesGrid" class="types-grid"></div></div>
   </section>
