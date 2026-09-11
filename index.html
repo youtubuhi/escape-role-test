@@ -22,6 +22,45 @@
 .debug-box{border:2px dashed var(--red);padding:16px;margin:26px 0;background:#fff9f7;font-size:13px;line-height:1.65}.debug-box h3{margin:0 0 10px;font-size:16px}.debug-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.debug-box pre{white-space:pre-wrap;margin:0;font:12px/1.6 monospace;color:#403b37}
 @media(max-width:520px){.app{padding:10px 14px 56px}h1{font-size:35px}.start-desc{font-size:16px}.qnum{font-size:24px}.question-title{font-size:18px}.question{font-size:14px;line-height:1.4}.answer{grid-template-columns:34px 1fr;padding:8px 1px 8px 0}.answer-text{font-size:13.3px;line-height:1.28}.result-title{font-size:30px}.analysis p{font-size:16px;line-height:1.72;margin-bottom:21px}.debug-grid{grid-template-columns:1fr}}
 </style>
+  .instagram-follow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  margin-top: 14px;
+  padding: 14px 10px;
+
+  color: #151515;
+  text-decoration: none;
+  text-align: left;
+
+  border-top: 1px solid #ddd7d0;
+}
+
+.instagram-follow svg {
+  flex: 0 0 auto;
+}
+
+.instagram-follow span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.instagram-follow strong {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.instagram-follow small {
+  font-size: 11px;
+  color: #777;
+}
+
+.instagram-follow:active {
+  opacity: 0.55;
+}
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-3GZCCYZ8W0"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-3GZCCYZ8W0',{anonymize_ip:true,send_page_view:false});</script>
@@ -39,6 +78,32 @@
     <button class="btn primary" type="button" onclick="begin()">테스트 시작</button>
     <button class="btn" type="button" onclick="shareTest()">친구에게 테스트 공유하기</button>
     <button class="btn" type="button" onclick="goToOtherTests('start')">다른 테스트 하러 가기</button>
+    <a
+  href="https://www.instagram.com/escapeplayerlab/"
+  target="_blank"
+  rel="noopener noreferrer"
+  class="instagram-follow"
+  onclick="gtag('event', 'instagram_follow_click');"
+>
+  <svg
+    viewBox="0 0 24 24"
+    width="21"
+    height="21"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.8"
+    aria-hidden="true"
+  >
+    <rect x="3" y="3" width="18" height="18" rx="5"></rect>
+    <circle cx="12" cy="12" r="4"></circle>
+    <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"></circle>
+  </svg>
+
+  <span>
+    <strong>방탈출 인간연구소 팔로우하기</strong>
+    <small>매주 새로운 테스트 소식 받기</small>
+  </span>
+</a>
   </section>
   <section id="quiz" class="hidden">
     <div class="quiz-head"><div id="qnum" class="qnum"></div><div class="check">TEAM ROLE CHECK</div></div>
